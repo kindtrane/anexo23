@@ -1,0 +1,63 @@
+<?php
+session_start();
+include_once "conexion.php";
+
+function verificar_login($user,$password,&$result) {
+    $sql = "SELECT * FROM usuarios WHERE usuario = '$user' and password = '$password'";
+    $rec = mysql_query($sql);
+    $count = 0;
+
+    while($row = mysql_fetch_object($rec))
+    {
+        $count++;
+        $result = $row;
+    }
+
+    if($count == 1)
+    {
+        return 1;
+    }
+
+    else
+    {
+        return 0;
+    }
+}
+
+if(!isset($_SESSION['userid']))
+{
+    if(isset($_POST['login']))
+    {
+        if(verificar_login($_POST['user'],$_POST['password'],$result) == 1)
+        {
+            $_SESSION['userid'] = $result->idusuario;
+            $_SESSION['usuario'] = $_POST['user'];
+            $_SESSION['estado'] = 'Autenticado';
+            header("location:menu.php");
+        }
+        else
+        {
+            echo '<div align="center" class="error">Su usuario o contraseña es incorrecto, intente nuevamente.</div>';
+        }
+    }
+?>
+
+<head>
+    <meta charset="utf-8">
+    <title>Inicio de Sesión</title>
+    <link href="estilos.css" rel="stylesheet" type="text/css">
+</head>
+<div class="group4">
+    <form action="" method="post" class="login">
+    <h2><em>Inicio de Sesión</em></h2>
+	<div align="center"><label>Usuario</label><input name="user" type="text" class="form-select2"></div>
+	<div align="center"><label>Contraseña</label><input name="password" type="password" class="form-select2"></div>
+	<div align="center"><input name="login" type="submit" value="Iniciar Sesión" class="form-btn"></div>
+    </form>
+</div>
+<?php
+} else {
+	echo 'Su usuario ingreso correctamente.';
+	echo '<a href="logout.php">Logout</a>';
+}
+?>
